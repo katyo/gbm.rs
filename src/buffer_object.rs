@@ -304,7 +304,7 @@ impl<T: 'static> BufferObject<T> {
     /// according to the width, height, stride and format of the buffer object.
     pub fn write(&mut self, buffer: &[u8]) -> Result<IoResult<()>, DeviceDestroyedError> {
         if self._device.upgrade().is_some() {
-            let result = unsafe { ::ffi::gbm_bo_write(self.ffi, buffer.as_ptr() as *const _, buffer.len()) };
+            let result = unsafe { ::ffi::gbm_bo_write(self.ffi, buffer.as_ptr() as *const _, buffer.len() as _) };
             if result != 0 {
                 Ok(Err(IoError::last_os_error()))
             } else {
@@ -438,7 +438,7 @@ impl<T: 'static> DrmBuffer for BufferObject<T> {
     }
 
     fn handle(&self) -> DrmId {
-        unsafe { DrmId::from_raw(*self.handle().expect("GbmDevice does not exist anymore").u32.as_ref()) }
+        unsafe { DrmId::from_raw(self.handle().expect("GbmDevice does not exist anymore").u32_) }
     }
 }
 
@@ -449,14 +449,8 @@ pub struct WrongDeviceError;
 impl fmt::Display for WrongDeviceError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use std::error::Error;
-        write!(f, "{}", self.description())
+        write!(f, "The gbm specified is not the one this buffer object belongs to")
     }
 }
 
-impl error::Error for WrongDeviceError {
-    fn description(&self) -> &str {
-        "The gbm specified is not the one this buffer object belongs to"
-    }
-
-    fn cause(&self) -> Option<&error::Error> { None }
-}
+impl error::Error for WrongDeviceError {}
