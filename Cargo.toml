@@ -11,14 +11,23 @@ authors = ["Victor Brekenfeld <github@drakulix.de>"]
 exclude = [".travis.yml", ".rustfmt.toml"]
 
 [dependencies]
-gbm-sys = { version = "0.1", path = "./gbm-sys" }
 libc = "0.2"
-bitflags = "1.0.0"
-wayland-server = { version = "0.12", optional = true }
-drm = { version = "0.3", optional = true }
+bitflags = "1.2"
 
-[dev-dependencies]
-drm = "0.3.0"
+[dependencies.gbm-sys]
+version = "0.2"
+path = "./gbm-sys"
+
+[dependencies.wayland-server]
+version = "0.28"
+optional = true
+
+[dependencies.drm]
+version = "0.3"
+optional = true
+
+[dev-dependencies.drm]
+version = "0.3"
 
 [features]
 default = ["import-wayland", "import-egl", "drm-support"]
@@ -26,3 +35,8 @@ import-wayland = ["wayland-server"]
 import-egl = []
 drm-support = ["drm"]
 gen = ["gbm-sys/gen"]
+
+[workspace]
+members = [
+  "./gbm-sys"
+]

@@ -11,10 +11,7 @@ use std::os::unix::io::{AsRawFd, RawFd};
 use std::rc::Rc;
 
 #[cfg(feature = "import-wayland")]
-use wayland_server::Resource;
-
-#[cfg(feature = "import-wayland")]
-use wayland_server::protocol::wl_buffer::WlBuffer;
+use wayland_server::{protocol::wl_buffer::WlBuffer, Resource};
 
 #[cfg(feature = "import-egl")]
 /// An EGLImage handle
@@ -165,14 +162,14 @@ impl<T: AsRawFd + 'static> Device<T> {
     #[cfg(feature = "import-wayland")]
     pub fn import_buffer_object_from_wayland<U: 'static>(
         &self,
-        buffer: &WlBuffer,
+        buffer: impl AsRef<Resource<WlBuffer>>,
         usage: BufferObjectFlags,
     ) -> IoResult<BufferObject<U>> {
         let ptr = unsafe {
             ::ffi::gbm_bo_import(
                 *self.ffi,
                 ::ffi::GBM_BO_IMPORT::WL_BUFFER as u32,
-                buffer.ptr() as *mut _,
+                buffer.as_ref().c_ptr() as *mut _,
                 usage.bits(),
             )
         };
