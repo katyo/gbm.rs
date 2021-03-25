@@ -274,15 +274,8 @@ pub struct DeviceDestroyedError;
 
 impl fmt::Display for DeviceDestroyedError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use std::error::Error;
-        write!(f, "{}", self.description())
+        "The underlying gbm device was already destroyed".fmt(f)
     }
 }
 
-impl error::Error for DeviceDestroyedError {
-    fn description(&self) -> &str {
-        "The underlying gbm device was already destroyed"
-    }
-
-    fn cause(&self) -> Option<&error::Error> { None }
-}
+impl error::Error for DeviceDestroyedError {}

@@ -1,4 +1,4 @@
-use std::error::{self, Error};
+use std::error;
 use std::fmt;
 use std::marker::PhantomData;
 use std::mem;
@@ -56,26 +56,15 @@ pub enum FrontBufferError {
 
 impl fmt::Display for FrontBufferError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.description())
-    }
-}
-
-impl error::Error for FrontBufferError {
-    fn description(&self) -> &str {
-        match *self {
-            FrontBufferError::NoFreeBuffers => "No free buffers remaining",
-            FrontBufferError::Unknown => "Unknown error",
-            FrontBufferError::Destroyed(ref err) => err.description(),
-        }
-    }
-
-    fn cause(&self) -> Option<&error::Error> {
-        match *self {
-            FrontBufferError::Destroyed(ref err) => Some(err),
-            _ => None,
+        match self {
+            FrontBufferError::NoFreeBuffers => "No free buffers remaining".fmt(f),
+            FrontBufferError::Unknown => "Unknown error".fmt(f),
+            FrontBufferError::Destroyed(err) => err.fmt(f),
         }
     }
 }
+
+impl error::Error for FrontBufferError {}
 
 impl<T: 'static> Surface<T> {
     ///  Return whether or not a surface has free (non-locked) buffers
