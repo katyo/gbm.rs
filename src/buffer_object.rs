@@ -1,7 +1,7 @@
 use {AsRaw, Device, DeviceDestroyedError, Format};
 
 #[cfg(feature = "drm-support")]
-use drm::buffer::{Buffer as DrmBuffer, Id as DrmId, PixelFormat as DrmPixelFormat};
+use drm::buffer::{format::PixelFormat as DrmPixelFormat, Buffer as DrmBuffer, Handle as DrmHandle};
 
 use std::error;
 use std::fmt;
@@ -450,8 +450,12 @@ impl<T: 'static> DrmBuffer for BufferObject<T> {
         self.stride().expect("GbmDevice does not exist anymore")
     }
 
-    fn handle(&self) -> DrmId {
-        unsafe { DrmId::from_raw(self.handle().expect("GbmDevice does not exist anymore").u32_) }
+    fn handle(&self) -> DrmHandle {
+        let handle = self.handle().expect("GbmDevice does not exist anymore");
+        let handle_id = unsafe { handle.u32_ };
+        core::num::NonZeroU32::new(handle_id)
+            .expect("GbmDevice handle is zero")
+            .into()
     }
 }
 
