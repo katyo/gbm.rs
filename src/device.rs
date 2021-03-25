@@ -5,10 +5,10 @@ use libc::c_void;
 use std::error;
 use std::ffi::CStr;
 use std::fmt;
-use std::rc::Rc;
 use std::io::{Error as IoError, Result as IoResult};
-use std::os::unix::io::{AsRawFd, RawFd};
 use std::ops::{Deref, DerefMut};
+use std::os::unix::io::{AsRawFd, RawFd};
+use std::rc::Rc;
 
 #[cfg(feature = "import-wayland")]
 use wayland_server::Resource;
@@ -21,9 +21,9 @@ use wayland_server::protocol::wl_buffer::WlBuffer;
 pub type EGLImage = *mut c_void;
 
 #[cfg(feature = "drm-support")]
-use drm::Device as DrmDevice;
-#[cfg(feature = "drm-support")]
 use drm::control::Device as DrmControlDevice;
+#[cfg(feature = "drm-support")]
+use drm::Device as DrmDevice;
 
 /// Type wrapping a foreign file destructor
 pub struct FdWrapper(RawFd);
@@ -76,7 +76,6 @@ impl Device<FdWrapper> {
     ///
     /// The lifetime of the resulting device depends on the ownership of the file descriptor.
     /// Closing the file descriptor before dropping the Device will lead to undefined behavior.
-    ///
     pub unsafe fn new_from_fd(fd: RawFd) -> IoResult<Device<FdWrapper>> {
         let ptr = ::ffi::gbm_create_device(fd);
         if ptr.is_null() {
@@ -119,13 +118,7 @@ impl<T: AsRawFd + 'static> Device<T> {
 
     /// Test if a format is supported for a given set of usage flags
     pub fn is_format_supported(&self, format: Format, usage: BufferObjectFlags) -> bool {
-        unsafe {
-            ::ffi::gbm_device_is_format_supported(
-                *self.ffi,
-                format.as_ffi(),
-                usage.bits(),
-            ) != 0
-        }
+        unsafe { ::ffi::gbm_device_is_format_supported(*self.ffi, format.as_ffi(), usage.bits()) != 0 }
     }
 
     /// Allocate a new surface object
@@ -136,15 +129,8 @@ impl<T: AsRawFd + 'static> Device<T> {
         format: Format,
         usage: BufferObjectFlags,
     ) -> IoResult<Surface<U>> {
-        let ptr = unsafe {
-            ::ffi::gbm_surface_create(
-                *self.ffi,
-                width,
-                height,
-                format.as_ffi(),
-                usage.bits(),
-            )
-        };
+        let ptr =
+            unsafe { ::ffi::gbm_surface_create(*self.ffi, width, height, format.as_ffi(), usage.bits()) };
         if ptr.is_null() {
             Err(IoError::last_os_error())
         } else {
@@ -160,15 +146,7 @@ impl<T: AsRawFd + 'static> Device<T> {
         format: Format,
         usage: BufferObjectFlags,
     ) -> IoResult<BufferObject<U>> {
-        let ptr = unsafe {
-            ::ffi::gbm_bo_create(
-                *self.ffi,
-                width,
-                height,
-                format.as_ffi(),
-                usage.bits(),
-            )
-        };
+        let ptr = unsafe { ::ffi::gbm_bo_create(*self.ffi, width, height, format.as_ffi(), usage.bits()) };
         if ptr.is_null() {
             Err(IoError::last_os_error())
         } else {
@@ -224,13 +202,12 @@ impl<T: AsRawFd + 'static> Device<T> {
         buffer: EGLImage,
         usage: BufferObjectFlags,
     ) -> IoResult<BufferObject<U>> {
-        let ptr =
-            ::ffi::gbm_bo_import(
-                *self.ffi,
-                ::ffi::GBM_BO_IMPORT::EGL_IMAGE as u32,
-                buffer,
-                usage.bits(),
-            );
+        let ptr = ::ffi::gbm_bo_import(
+            *self.ffi,
+            ::ffi::GBM_BO_IMPORT::EGL_IMAGE as u32,
+            buffer,
+            usage.bits(),
+        );
         if ptr.is_null() {
             Err(IoError::last_os_error())
         } else {
