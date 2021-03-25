@@ -10,16 +10,15 @@ use std::path::Path;
 fn main() {}
 
 #[cfg(feature = "gen")]
-fn main()
-{
+fn main() {
     // Setup bindings builder
     let generated = bindgen::builder()
         .header("include/gbm.h")
-        .no_unstable_rust()
         .ctypes_prefix("libc")
-        .whitelisted_type(r"^gbm_.*$")
-        .whitelisted_function(r"^gbm_.*$")
+        .whitelist_type(r"^gbm_.*$")
+        .whitelist_function(r"^gbm_.*$")
         .constified_enum("gbm_bo_flags")
+        .constified_enum_module("gbm_bo_transfer_flags")
         .generate()
         .unwrap();
 
@@ -27,7 +26,8 @@ fn main()
 
     // Generate the bindings
     let out_dir = env::var("OUT_DIR").unwrap();
-    let dest_path = Path::new(&out_dir).join("gen.rs");
+    let bind_name = "gen.rs";
+    let dest_path = Path::new(&out_dir).join(bind_name);
 
     generated.write_to_file(dest_path).unwrap();
 }
