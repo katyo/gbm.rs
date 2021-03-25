@@ -89,8 +89,10 @@ impl<T: 'static> Surface<T> {
     ///
     /// If an error occurs a `FrontBufferError` is returned.
     ///
-    /// **Unsafety**: This function must be called exactly once after calling
-    /// `eglSwapBuffers`.  Calling it before any `eglSwapBuffer` has happened
+    /// # Safety
+    ///
+    /// This function must be called exactly once after calling
+    /// `eglSwapBuffers`. Calling it before any `eglSwapBuffer` has happened
     /// on the surface or two or more times after `eglSwapBuffers` is an
     /// error and may cause undefined behavior.
     pub unsafe fn lock_front_buffer(&self) -> Result<SurfaceBufferHandle<T>, FrontBufferError> {

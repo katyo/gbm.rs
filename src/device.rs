@@ -98,7 +98,7 @@ impl<T: AsRawFd + 'static> Device<T> {
             Err(IoError::last_os_error())
         } else {
             Ok(Device {
-                fd: fd,
+                fd,
                 ffi: Rc::new(ptr),
             })
         }
@@ -189,7 +189,7 @@ impl<T: AsRawFd + 'static> Device<T> {
     /// The gbm bo shares the underlying pixels but its life-time is
     /// independent of the foreign object.
     ///
-    /// ## Unsafety
+    /// # Safety
     ///
     /// The given EGLImage is a raw pointer. Passing null or an invalid EGLImage will
     /// cause undefined behavior.
@@ -231,9 +231,9 @@ impl<T: AsRawFd + 'static> Device<T> {
     ) -> IoResult<BufferObject<U>> {
         let mut fd_data = ::ffi::gbm_import_fd_data {
             fd: buffer,
-            width: width,
-            height: height,
-            stride: stride,
+            width,
+            height,
+            stride,
             format: format.as_ffi(),
         };
 
