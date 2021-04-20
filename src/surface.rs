@@ -66,7 +66,9 @@ impl<T: 'static> Surface<T> {
     ///
     /// If an error occurs a `FrontBufferError` is returned.
     ///
-    /// **Unsafety**: This function must be called exactly once after calling
+    /// # Safety
+    ///
+    /// This function must be called exactly once after calling
     /// `eglSwapBuffers`.  Calling it before any `eglSwapBuffer` has happened
     /// on the surface or two or more times after `eglSwapBuffers` is an
     /// error and may cause undefined behavior.
@@ -76,7 +78,7 @@ impl<T: 'static> Surface<T> {
             if ::ffi::gbm_surface_has_free_buffers(*self.ffi) != 0 {
                 let buffer_ptr = ::ffi::gbm_surface_lock_front_buffer(*self.ffi);
                 if !buffer_ptr.is_null() {
-                    let surface_ptr = self.ffi.downgrade().clone();
+                    let surface_ptr = self.ffi.downgrade();
                     let buffer = BufferObject {
                         ffi: Ptr::new(buffer_ptr, move |ptr| {
                             if let Some(surface) = surface_ptr.upgrade() {

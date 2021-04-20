@@ -70,7 +70,7 @@ impl Device<FdWrapper> {
     /// platform for allocating the memory. For allocations using DRI this would be
     /// the file descriptor returned when opening a device such as /dev/dri/card0.
     ///
-    /// # Unsafety
+    /// # Safety
     ///
     /// The lifetime of the resulting device depends on the ownership of the file descriptor.
     /// Closing the file descriptor before dropping the Device will lead to undefined behavior.
@@ -100,7 +100,7 @@ impl<T: AsRawFd + 'static> Device<T> {
             Err(IoError::last_os_error())
         } else {
             Ok(Device {
-                fd: fd,
+                fd,
                 ffi: Ptr::<::ffi::gbm_device>::new(ptr, |ptr| unsafe {
                     ::ffi::gbm_device_destroy(ptr)
                 }),
@@ -255,7 +255,7 @@ impl<T: AsRawFd + 'static> Device<T> {
     /// The gbm bo shares the underlying pixels but its life-time is
     /// independent of the foreign object.
     ///
-    /// ## Unsafety
+    /// # Safety
     ///
     /// The given EGLImage is a raw pointer. Passing null or an invalid EGLImage will
     /// cause undefined behavior.
@@ -326,6 +326,7 @@ impl<T: AsRawFd + 'static> Device<T> {
     ///
     /// The gbm bo shares the underlying pixels but its life-time is
     /// independent of the foreign object.
+    #[allow(clippy::too_many_arguments)]
     pub fn import_buffer_object_from_dma_buf_with_modifiers<U: 'static>(
         &self,
         len: u32,
