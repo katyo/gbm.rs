@@ -6,11 +6,11 @@ pub const GBM_BO_IMPORT_EGL_IMAGE: u32 = 21762;
 pub const GBM_BO_IMPORT_FD: u32 = 21763;
 pub const GBM_BO_IMPORT_FD_MODIFIER: u32 = 21764;
 pub const GBM_MAX_PLANES: u32 = 4;
-pub type size_t = libc::c_ulong;
+pub type size_t = libc::c_uint;
 pub type __int32_t = libc::c_int;
 pub type __uint32_t = libc::c_uint;
-pub type __int64_t = libc::c_long;
-pub type __uint64_t = libc::c_ulong;
+pub type __int64_t = libc::c_longlong;
+pub type __uint64_t = libc::c_ulonglong;
 #[doc = " \\file gbm.h"]
 #[doc = " \\brief Generic Buffer Manager"]
 #[repr(C)]
@@ -38,7 +38,7 @@ pub union gbm_bo_handle {
     pub u32_: u32,
     pub s64: i64,
     pub u64_: u64,
-    _bindgen_union_align: u64,
+    _bindgen_union_align: [u32; 2usize],
 }
 #[test]
 fn bindgen_test_layout_gbm_bo_handle() {
@@ -49,7 +49,7 @@ fn bindgen_test_layout_gbm_bo_handle() {
     );
     assert_eq!(
         ::std::mem::align_of::<gbm_bo_handle>(),
-        8usize,
+        4usize,
         concat!("Alignment of ", stringify!(gbm_bo_handle))
     );
     assert_eq!(
@@ -304,7 +304,7 @@ fn bindgen_test_layout_gbm_import_fd_modifier_data() {
     );
     assert_eq!(
         ::std::mem::align_of::<gbm_import_fd_modifier_data>(),
-        8usize,
+        4usize,
         concat!("Alignment of ", stringify!(gbm_import_fd_modifier_data))
     );
     assert_eq!(
